@@ -8,8 +8,8 @@ app = FastAPI()
 # OPENAI_API_KEY = "your_openai_api_key"
 # openai.api_key = OPENAI_API_KEY
 
-class TaskRequest(BaseModel):
-    task: str
+#class TaskRequest(BaseModel):
+ #   task: str
 
 # @app.post("/run")
 #async def run_task(task: str = Query(..., description="Task description in plain English")):
