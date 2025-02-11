@@ -11,7 +11,7 @@ app = FastAPI()
 
 class TaskRequest(BaseModel):
     task: str
-
+'''
 @app.post("/run")
 async def run_task(task: str = Query(..., description="Task description in plain English")):
     try:
@@ -23,7 +23,7 @@ async def run_task(task: str = Query(..., description="Task description in plain
                 {"role": "user", "content": task}
             ]
         )
-        
+   '''     
         result = response["choices"][0]["message"]["content"].strip()
         return {"status": "success", "result": result}
     
