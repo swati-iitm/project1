@@ -6,8 +6,8 @@ import os
 app = FastAPI()
 
 # Configure OpenAI API key (ensure you set this securely)
-OPENAI_API_KEY = "your_openai_api_key"
-openai.api_key = OPENAI_API_KEY
+# OPENAI_API_KEY = "your_openai_api_key"
+# openai.api_key = OPENAI_API_KEY
 
 class TaskRequest(BaseModel):
     task: str
