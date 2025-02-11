@@ -34,6 +34,7 @@ async def run_task(task: str = Query(..., description="Task description in plain
 
 @app.get("/read")
 async def read_file(path: str = Query(..., description="Path to the file")):
+    return "We are in get function now"
     if not os.path.exists(path):
         raise HTTPException(status_code=404, detail="File not found")
     try:
