@@ -10,26 +10,26 @@ app = FastAPI()
 
 class TaskRequest(BaseModel):
     task: str
-'''
-@app.post("/run")
-async def run_task(task: str = Query(..., description="Task description in plain English")):
-    try:
+
+# @app.post("/run")
+#async def run_task(task: str = Query(..., description="Task description in plain English")):
+ #   try:
         # Query OpenAI LLM to interpret and execute the task
-        response = openai.ChatCompletion.create(
-            model="gpt-4",  # Ensure you're using an appropriate model
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant capable of executing tasks."},
-                {"role": "user", "content": task}
-            ]
-        )
-   '''     
-        result = response["choices"][0]["message"]["content"].strip()
-        return {"status": "success", "result": result}
+  #      response = openai.ChatCompletion.create(
+   #         model="gpt-4",  # Ensure you're using an appropriate model
+    #        messages=[
+     #           {"role": "system", "content": "You are a helpful assistant capable of executing tasks."},
+      #          {"role": "user", "content": task}
+       #     ]
+        #)
+     
+   #     result = response["choices"][0]["message"]["content"].strip()
+    #    return {"status": "success", "result": result}
     
-    except openai.error.OpenAIError as e:
-        raise HTTPException(status_code=500, detail=f"LLM processing error: {str(e)}")
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid task: {str(e)}")
+    #except openai.error.OpenAIError as e:
+     #   raise HTTPException(status_code=500, detail=f"LLM processing error: {str(e)}")
+    #except Exception as e:
+     #   raise HTTPException(status_code=400, detail=f"Invalid task: {str(e)}")
 
 @app.get("/read")
 async def read_file(path: str = Query(..., description="Path to the file")):
