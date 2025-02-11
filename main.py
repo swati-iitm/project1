@@ -1,41 +1,44 @@
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Optional
-import json
+from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel
+import openai
+import os
 
 app = FastAPI()
 
-# Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allow all methods
-    allow_headers=["*"],  # Allow all headers
-)
+# Configure OpenAI API key (ensure you set this securely)
+OPENAI_API_KEY = "your_openai_api_key"
+openai.api_key = OPENAI_API_KEY
 
-# Load student data from the specified JSON file
-file_path = "q-vercel-python_2.json"
+class TaskRequest(BaseModel):
+    task: str
 
-try:
-    with open(file_path, "r") as file:
-        students = json.load(file)  # Load data into `students`
-except FileNotFoundError:
-    students = []  # Default to an empty list if the file is missing
-
-# Convert list of students to a dictionary for quick lookup
-students_dict = {entry["name"]: entry["marks"] for entry in students}
-
-@app.get("/")
-async def get_students(name: Optional[List[str]] = Query(default=[])):
-    """Fetch student marks based on optional name filtering while maintaining order."""
-    if name:
-        # Preserve the order in which names are passed
-        filtered_marks = [students_dict.get(n, None) for n in name]
-        return {"marks": filtered_marks}
+@app.post("/run")
+async def run_task(task: str = Query(..., description="Task description in plain English")):
+    try:
+        # Query OpenAI LLM to interpret and execute the task
+        response = openai.ChatCompletion.create(
+            model="gpt-4",  # Ensure you're using an appropriate model
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant capable of executing tasks."},
+                {"role": "user", "content": task}
+            ]
+        )
+        
+        result = response["choices"][0]["message"]["content"].strip()
+        return {"status": "success", "result": result}
     
-    return {"marks": students}  # Return all data if no filter is applied
+    except openai.error.OpenAIError as e:
+        raise HTTPException(status_code=500, detail=f"LLM processing error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid task: {str(e)}")
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+@app.get("/read")
+async def read_file(path: str = Query(..., description="Path to the file")):
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        with open(path, "r", encoding="utf-8") as file:
+            content = file.read()
+        return {"status": "success", "content": content}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
